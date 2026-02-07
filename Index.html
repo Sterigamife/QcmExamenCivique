@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>QCM Citoyenneté 🇫🇷</title>
+	<style>
+		body {
+			margin: 0;
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+			background: #f2f4f8;
+		}
+
+		.container {
+			max-width: 500px;
+			margin: auto;
+			min-height: 100vh;
+			background: white;
+			padding: 16px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+		}
+
+		h1 {
+			text-align: center;
+			font-size: 1.4rem;
+			margin-bottom: 16px;
+		}
+
+		button {
+			padding: 14px;
+			margin: 8px 0;
+			font-size: 1rem;
+			border: none;
+			border-radius: 10px;
+			background: #3b82f6;
+			color: white;
+			cursor: pointer;
+		}
+
+		button:active {
+			transform: scale(0.98);
+		}
+
+		.correct {
+			background: #22c55e !important;
+		}
+
+		.wrong {
+			background: #ef4444 !important;
+		}
+
+		.topbar {
+			display: flex;
+			justify-content: space-between;
+			font-size: 0.9rem;
+			margin-bottom: 10px;
+		}
+
+		.question {
+			font-size: 1.1rem;
+			margin-bottom: 12px;
+		}
+
+		.explanation {
+			background: #eef2ff;
+			padding: 10px;
+			border-radius: 8px;
+			margin-top: 10px;
+			font-size: 0.9rem;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="container">
+		<h1>QCM Citoyenneté 🇫🇷</h1>
+
+		<div id="menu">
+			<button onclick="startQuiz('republique')">🏛️ République</button>
+			<button onclick="startQuiz('droitsa')">⚖️ Droits & laïcité</button>
+			<button onclick="startQuiz('europe')">🇪🇺 Europe</button>
+			<button onclick="startQuiz('citoyennete')">🗳️ Citoyenneté & élections</button>
+			<button onclick="startQuiz('histoire')">🕰️ Histoire de France</button>
+			<button onclick="startQuiz('geographie')">🗺️ Géographie & territoires</button>
+			<button onclick="startQuiz('culture')">🎨 Culture & patrimoine</button>
+			<button onclick="startQuiz('vie')">🏠 Vie quotidienne</button>
+		</div>
+
+		<div id="quiz" style="display:none;">
+			<div class="topbar">
+				<div id="timer">⏱️ 60 s</div>
+				<div id="score">Score : 0</div>
+			</div>
+			<div id="content"></div>
+		</div>
+	</div>
+
+	<script>
+		const data = {
+			republique: [{
+					q: "Quelle est la devise de la République française ?",
+					a: ["Liberté, Égalité, Fraternité", "Travail, Famille, Patrie", "Unité, Justice, Paix"],
+					c: 0,
+					e: "La devise de la République est « Liberté, Égalité, Fraternité »."
+				},
+
+				{
+					q: "Qui est le chef de l'État en France ?",
+					a: ["Le Président de la République", "Le Premier ministre", "Le Président du Sénat"],
+					c: 0,
+					e: "Le Président de la République est le chef de l’État."
+				},
+
+				{
+					q: "Quelle est la durée du mandat du Président de la République ?",
+					a: ["5 ans", "6 ans", "7 ans"],
+					c: 0,
+					e: "Depuis 2002, le mandat présidentiel est de 5 ans."
+				},
+
+				{
+					q: "Qui vote les lois en France ?",
+					a: ["Le Parlement", "Le Président", "Le Conseil constitutionnel"],
+					c: 0,
+					e: "Les lois sont votées par le Parlement (Assemblée nationale + Sénat)."
+				},
+
+				{
+					q: "Qui dirige l'action du gouvernement ?",
+					a: ["Le Président de la République", "Le Premier ministre", "Le Conseil d'État"],
+					c: 1,
+					e: "Le Premier ministre dirige l’action du gouvernement."
+				},
+
+				{
+					q: "À qui appartient la souveraineté nationale ?",
+					a: ["Au Président", "Au peuple", "Au Parlement"],
+					c: 1,
+					e: "La souveraineté nationale appartient au peuple."
+				}
+			],
+
+			droitsa: [{
+					q: "Qu’est-ce que la laïcité ?",
+					a: ["La séparation des religions et de l'État", "L’interdiction des religions", "La religion officielle de la France"],
+					c: 0,
+					e: "La laïcité garantit la neutralité de l’État et la liberté de conscience."
+				},
+
+				{
+					q: "Que garantit la liberté d’expression en France ?",
+					a: ["Dire tout ce qu’on veut sans limite", "Exprimer ses opinions dans le respect de la loi", "Critiquer uniquement l'État"],
+					c: 1,
+					e: "La liberté d’expression existe, mais elle est limitée par la loi (diffamation, haine, etc.)."
+				},
+
+				{
+					q: "Peut-on changer librement de religion en France ?",
+					a: ["Oui", "Non", "Seulement avec une autorisation"],
+					c: 0,
+					e: "La liberté de conscience permet de croire, de ne pas croire ou de changer de religion."
+				},
+
+				{
+					q: "Selon le principe de laïcité, que signifie la neutralité de l’État ?",
+					a: ["L'État favorise une religion", "L'État ne favorise aucune religion", "L'État impose une religion"],
+					c: 1,
+					e: "L’État est neutre et garantit la liberté religieuse de tous."
+				},
+
+				{
+					q: "Que dit la loi de 1905 ?",
+					a: ["Elle impose une religion d’État", "Elle sépare les Églises et l’État", "Elle interdit les religions"],
+					c: 1,
+					e: "La loi de 1905 fonde la laïcité en France."
+				},
+
+				{
+					q: "Quel texte fondateur affirme que tous les hommes naissent libres et égaux en droits ?",
+					a: ["La Constitution de 1958", "La Déclaration des droits de l’homme et du citoyen de 1789", "Le Code civil"],
+					c: 1,
+					e: "La DDHC de 1789 pose les bases des libertés fondamentales."
+				},
+
+				{
+					q: "La liberté d’association est :",
+					a: ["Interdite", "Un droit fondamental", "Réservée aux citoyens français"],
+					c: 1,
+					e: "Chacun peut créer ou rejoindre une association dans le respect de la loi."
+				},
+
+				{
+					q: "Peut-on brûler publiquement le drapeau français ?",
+					a: ["Oui, c’est une liberté totale", "Non, c’est une infraction", "Seulement le 14 juillet"],
+					c: 1,
+					e: "Outrager le drapeau est puni par la loi."
+				}
+			],
+
+			europe: [{
+					q: "Combien d’États font partie de l’Union européenne en 2025 ?",
+					a: ["27", "28", "30"],
+					c: 0,
+					e: "Depuis le Brexit, l’UE compte 27 États membres."
+				},
+
+				{
+					q: "Quelle est la devise de l’Union européenne ?",
+					a: ["Paix et justice", "Unie dans la diversité", "Liberté, Égalité, Fraternité"],
+					c: 1,
+					e: "La devise officielle est « Unie dans la diversité »."
+				},
+
+				{
+					q: "Quel traité marque la fondation de l’Union européenne ?",
+					a: ["Traité de Maastricht (1992)", "Traité de Rome (1957)", "Traité de Lisbonne (2009)"],
+					c: 0,
+					e: "Le traité de Maastricht fonde l’Union européenne."
+				},
+
+				{
+					q: "Quel État a quitté l’Union européenne en 2020 ?",
+					a: ["Royaume-Uni", "Norvège", "Suisse"],
+					c: 0,
+					e: "Le Royaume-Uni a quitté l’UE le 31 janvier 2020."
+				},
+
+				{
+					q: "Qui élit les députés européens ?",
+					a: ["Les États membres", "Les citoyens de l’UE", "Le Conseil européen"],
+					c: 1,
+					e: "Les députés européens sont élus directement par les citoyens de l’UE."
+				},
+
+				{
+					q: "Où est le siège du Parlement européen ?",
+					a: ["Bruxelles et Strasbourg", "Paris", "Luxembourg"],
+					c: 0,
+					e: "Le Parlement européen siège à Strasbourg et Bruxelles."
+				},
+
+				{
+					q: "Qui a composé l’hymne de l’Union européenne ?",
+					a: ["Beethoven", "Mozart", "Bach"],
+					c: 0,
+					e: "L’hymne de l’UE est l’Ode à la joie de Beethoven."
+				},
+
+				{
+					q: "Quand est célébrée la journée de l’Europe ?",
+					a: ["9 mai", "14 juillet", "1er mai"],
+					c: 0,
+					e: "La Journée de l’Europe est célébrée le 9 mai."
+				}
+			],
+
+			citoyennete: [{
+					q: "À quel âge peut-on voter en France ?",
+					a: ["16 ans", "18 ans", "21 ans"],
+					c: 1,
+					e: "Le droit de vote est accordé à partir de 18 ans."
+				},
+
+				{
+					q: "Qui est élu lors des élections municipales ?",
+					a: ["Le maire et le conseil municipal", "Le Président", "Les députés"],
+					c: 0,
+					e: "Les citoyens élisent le maire et le conseil municipal."
+				},
+
+				{
+					q: "Comment est désigné le Premier ministre ?",
+					a: ["Par le Président", "Par les députés", "Par référendum"],
+					c: 0,
+					e: "Le Premier ministre est nommé par le Président de la République."
+				},
+
+				{
+					q: "Qui peut se présenter aux élections présidentielles ?",
+					a: ["Tout citoyen français majeur", "Tout citoyen européen", "Tout résident en France"],
+					c: 0,
+					e: "Tout citoyen français de plus de 18 ans peut se présenter à la présidence."
+				},
+
+				{
+					q: "À qui appartient la souveraineté nationale ?",
+					a: ["Au Président", "Au peuple", "Au Parlement"],
+					c: 1,
+					e: "La souveraineté nationale appartient au peuple."
+				},
+
+				{
+					q: "L’inscription sur les listes électorales est :",
+					a: ["Obligatoire", "Facultative mais nécessaire pour voter", "Automatique à la naissance"],
+					c: 1,
+					e: "Il faut s’inscrire pour pouvoir voter."
+				},
+
+				{
+					q: "Qui vote les lois en France ?",
+					a: ["Le Président", "Le Parlement", "Le Conseil constitutionnel"],
+					c: 1,
+					e: "Les lois sont votées par le Parlement (Assemblée nationale + Sénat)."
+				},
+
+				{
+					q: "Quelles sont les fonctions principales du maire ?",
+					a: ["Administrer la commune et représenter l'État", "Nommer le Premier ministre", "Écrire les lois"],
+					c: 0,
+					e: "Le maire gère la commune et représente l’État pour certaines missions."
+				}
+			],
+
+			histoire: [{
+					q: "En quelle année a débuté la Révolution française ?",
+					a: ["1789", "1792", "1804"],
+					c: 0,
+					e: "La Révolution française commence en 1789 avec la prise de la Bastille."
+				},
+
+				{
+					q: "Quel roi de France a été guillotiné pendant la Révolution ?",
+					a: ["Louis XVI", "Louis XIV", "Napoléon Ier"],
+					c: 0,
+					e: "Louis XVI a été exécuté en 1793."
+				},
+
+				{
+					q: "Quand Napoléon Ier est-il devenu empereur ?",
+					a: ["1799", "1804", "1815"],
+					c: 1,
+					e: "Napoléon Ier devient empereur en 1804."
+				},
+
+				{
+					q: "Quand a été instaurée la Cinquième République ?",
+					a: ["1946", "1958", "1962"],
+					c: 1,
+					e: "La Constitution de la Ve République a été adoptée en 1958."
+				},
+
+				{
+					q: "Qui a été une figure de la Résistance française pendant la Seconde Guerre mondiale ?",
+					a: ["Charles de Gaulle", "Louis XIV", "Napoléon III"],
+					c: 0,
+					e: "Charles de Gaulle dirige la France libre et la Résistance."
+				},
+
+				{
+					q: "Que célèbre-t-on le 8 mai ?",
+					a: ["La fin de la Première Guerre mondiale", "La fin de la Seconde Guerre mondiale en Europe", "Le 14 juillet"],
+					c: 1,
+					e: "Le 8 mai célèbre la victoire alliée et la fin de la Seconde Guerre mondiale en Europe."
+				},
+
+				{
+					q: "Depuis quand l’esclavage a-t-il été aboli en France ?",
+					a: ["1848", "1789", "1815"],
+					c: 0,
+					e: "L’abolition de l’esclavage a été votée en 1848."
+				},
+
+				{
+					q: "Qui a rendu l'école gratuite, laïque et obligatoire ?",
+					a: ["Jules Ferry", "Napoléon", "Louis XIV"],
+					c: 0,
+					e: "Jules Ferry a instauré l’école gratuite, obligatoire et laïque à la fin du XIXe siècle."
+				}
+			],
+
+			geographie: [{
+					q: "Quelle est la plus haute montagne de France ?",
+					a: ["Mont Blanc", "Mont Ventoux", "Puy de Dôme"],
+					c: 0,
+					e: "Le Mont Blanc, dans les Alpes, culmine à 4 808 m."
+				},
+
+				{
+					q: "Combien y a-t-il de régions en France métropolitaine ?",
+					a: ["13", "18", "22"],
+					c: 0,
+					e: "La France métropolitaine compte 13 régions."
+				},
+
+				{
+					q: "Quel fleuve traverse Paris ?",
+					a: ["La Seine", "Le Rhône", "La Loire"],
+					c: 0,
+					e: "La Seine traverse Paris et se jette dans la Manche."
+				},
+
+				{
+					q: "Quelle île française est située dans l’océan Indien ?",
+					a: ["La Réunion", "La Corse", "Madère"],
+					c: 0,
+					e: "La Réunion est un département français d’outre-mer dans l’océan Indien."
+				},
+
+				{
+					q: "Quel département français a une frontière avec le Brésil ?",
+					a: ["Guyane", "Martinique", "Guadeloupe"],
+					c: 0,
+					e: "La Guyane française partage une frontière avec le Brésil."
+				},
+
+				{
+					q: "Quelle chaîne de montagnes sépare la France et l’Italie ?",
+					a: ["Les Alpes", "Les Pyrénées", "Le Massif central"],
+					c: 0,
+					e: "Les Alpes se situent entre la France et l’Italie."
+				},
+
+				{
+					q: "Quelle chaîne de montagnes sépare la France et l’Espagne ?",
+					a: ["Les Pyrénées", "Les Alpes", "Le Jura"],
+					c: 0,
+					e: "Les Pyrénées font la frontière naturelle avec l’Espagne."
+				},
+
+				{
+					q: "Quel est le principal port maritime de France ?",
+					a: ["Le Havre", "Marseille", "Bordeaux"],
+					c: 1,
+					e: "Marseille est le premier port maritime français."
+				}
+			],
+
+			culture: [{
+					q: "Qui a peint 'La Liberté guidant le peuple' ?",
+					a: ["Eugène Delacroix", "Claude Monet", "Auguste Renoir"],
+					c: 0,
+					e: "Delacroix a peint ce tableau emblématique de 1830."
+				},
+
+				{
+					q: "Quel musée abrite la Joconde ?",
+					a: ["Musée du Louvre", "Musée d'Orsay", "Centre Pompidou"],
+					c: 0,
+					e: "La Joconde est exposée au Louvre à Paris."
+				},
+
+				{
+					q: "Quel château célèbre symbolise le pouvoir royal de Louis XIV ?",
+					a: ["Versailles", "Fontainebleau", "Chambord"],
+					c: 0,
+					e: "Le château de Versailles est le symbole du pouvoir royal."
+				},
+
+				{
+					q: "Où peut-on voir des peintures préhistoriques en France ?",
+					a: ["Grotte de Lascaux", "Mont Saint-Michel", "Château de Chenonceau"],
+					c: 0,
+					e: "La grotte de Lascaux est célèbre pour ses peintures préhistoriques."
+				},
+
+				{
+					q: "Qui a écrit 'Les Misérables' ?",
+					a: ["Victor Hugo", "Molière", "Albert Camus"],
+					c: 0,
+					e: "Victor Hugo est l’auteur des Misérables."
+				},
+
+				{
+					q: "Quelle spécialité culinaire est française ?",
+					a: ["Cassoulet", "Pizza", "Paella"],
+					c: 0,
+					e: "Le cassoulet est un plat traditionnel français."
+				},
+
+				{
+					q: "Qui était Marie Curie ?",
+					a: ["Scientifique", "Peintre", "Écrivain"],
+					c: 0,
+					e: "Marie Curie est célèbre pour ses recherches sur la radioactivité."
+				},
+
+				{
+					q: "Quel peintre a réalisé les Nymphéas ?",
+					a: ["Claude Monet", "Paul Cézanne", "Auguste Renoir"],
+					c: 0,
+					e: "Claude Monet a peint les Nymphéas, œuvres impressionnistes célèbres."
+				}
+			],
+
+			vie: [{
+					q: "Quel est le numéro d'urgence pour appeler la police ?",
+					a: ["15", "17", "18"],
+					c: 1,
+					e: "Le 17 est le numéro pour la police."
+				},
+
+				{
+					q: "Quel est le numéro d'urgence pour appeler le SAMU ?",
+					a: ["15", "17", "18"],
+					c: 0,
+					e: "Le 15 permet de joindre le SAMU."
+				},
+
+				{
+					q: "Quelle est la durée légale du travail en France ?",
+					a: ["35 heures/semaine", "40 heures/semaine", "48 heures/semaine"],
+					c: 0,
+					e: "La durée légale est de 35 heures par semaine."
+				},
+
+				{
+					q: "Qui peut demander un congé parental d'éducation ?",
+					a: ["Parents salariés", "Employeurs", "Étudiants"],
+					c: 0,
+					e: "Les parents salariés peuvent demander un congé parental d’éducation."
+				},
+
+				{
+					q: "L'avortement est-il possible en France ?",
+					a: ["Oui", "Non", "Seulement avec autorisation du maire"],
+					c: 0,
+					e: "L’IVG est légal en France."
+				},
+
+				{
+					q: "Travailler sans être déclaré est :",
+					a: ["Illégal", "Légal", "Autorisé pour les mineurs"],
+					c: 0,
+					e: "Le travail non déclaré est interdit par la loi."
+				},
+
+				{
+					q: "Qu’est-ce que le SMIC ?",
+					a: ["Salaire minimum légal", "Impôt sur le revenu", "Allocation chômage"],
+					c: 0,
+					e: "Le SMIC est le salaire minimum légal en France."
+				},
+
+				{
+					q: "Jusqu’à quel âge l’école est obligatoire ?",
+					a: ["16 ans", "18 ans", "15 ans"],
+					c: 0,
+					e: "L’instruction est obligatoire de 3 à 16 ans."
+				},
+
+				{
+					q: "Est-il obligatoire de porter secours à une personne en danger ?",
+					a: ["Oui", "Non", "Seulement pour les professionnels"],
+					c: 0,
+					e: "Tout citoyen doit porter assistance à une personne en danger."
+				},
+
+				{
+					q: "Qui gère les collèges publics en France ?",
+					a: ["Le département", "La région", "La commune"],
+					c: 0,
+					e: "Les collèges publics sont sous la responsabilité du département."
+				},
+
+				{
+					q: "Qui gère les écoles primaires et maternelles publiques ?",
+					a: ["La commune", "Le département", "La région"],
+					c: 0,
+					e: "Les écoles maternelles et primaires sont gérées par la commune."
+				},
+
+				{
+					q: "À quoi sert la carte Vitale ?",
+					a: ["Payer les impôts", "Accéder aux soins et remboursement santé", "Permis de conduire"],
+					c: 1,
+					e: "La carte Vitale permet de se faire rembourser ses frais de santé."
+				},
+
+				{
+					q: "Qu’est-ce que le tiers payant ?",
+					a: ["Paiement direct par l’assurance maladie", "Paiement différé par l’employeur", "Exonération d’impôts"],
+					c: 0,
+					e: "Le tiers payant permet de ne pas avancer les frais médicaux."
+				}
+			]
+		};
+
+
+		let questions = [];
+		let wrongOnly = [];
+		let index = 0;
+		let score = 0;
+		let time = 60;
+		let timer;
+
+		function startQuiz(theme) {
+			questions = [...data[theme]].sort(() => Math.random() - 0.5);
+			index = 0;
+			score = 0;
+			time = 60;
+			document.getElementById("menu").style.display = "none";
+			document.getElementById("quiz").style.display = "block";
+			startTimer();
+			render();
+		}
+
+		function startTimer() {
+			document.getElementById("timer").textContent = "⏱️ " + time + " s";
+			timer = setInterval(() => {
+				time--;
+				document.getElementById("timer").textContent = "⏱️ " + time + " s";
+				if (time <= 0) finish();
+			}, 1000);
+		}
+
+		function render() {
+			const q = questions[index];
+			document.getElementById("content").innerHTML = `
+    <div class="question">${q.q}</div>
+    ${q.a.map((x,i)=>`<button onclick="answer(${i})">${x}</button>`).join("")}
+  `;
+		}
+
+		function answer(i) {
+			const q = questions[index];
+			const btns = document.querySelectorAll("#content button");
+			btns.forEach((b, idx) => {
+				if (idx === q.c) b.classList.add("correct");
+				if (idx === i && i !== q.c) b.classList.add("wrong");
+				b.disabled = true;
+			});
+
+			if (i === q.c) score++;
+			else wrongOnly.push(q);
+
+			document.getElementById("score").textContent = "Score : " + score;
+			document.getElementById("content").innerHTML += `
+    <div class="explanation">📘 ${q.e}</div>
+    <button onclick="next()">➡️ Suivant</button>
+  `;
+		}
+
+		function next() {
+			index++;
+			if (index < questions.length) render();
+			else finish();
+		}
+
+		function finish() {
+			clearInterval(timer);
+			document.getElementById("content").innerHTML = `
+    <h2>🏁 Terminé !</h2>
+    <p>Score : ${score} / ${questions.length}</p>
+    <button onclick="restartWrong()">🧪 Refaire mes erreurs</button>
+    <button onclick="location.reload()">🔁 Menu</button>
+  `;
+		}
+
+		function restartWrong() {
+			if (wrongOnly.length === 0) {
+				alert("Bravo, zéro faute ! 🎉");
+				return;
+			}
+			questions = [...wrongOnly];
+			wrongOnly = [];
+			index = 0;
+			score = 0;
+			time = 60;
+			startTimer();
+			render();
+		}
+	</script>
+</body>
+
+</html>
